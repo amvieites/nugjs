@@ -1,0 +1,112 @@
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Universe</title>
+        <style>
+            body {
+                text-align: center;
+                font-family: "Verdana";
+                font-size: 0.6em;
+                padding: 0;
+                margin: 0;
+            }
+            #universe {
+                background: #fff;
+            }
+            #container {
+                text-align: left;
+                display: inline-block;
+            }
+            #hud {
+                width: 100%;
+                display: inline-block;
+            }
+            #colour-grid {
+                border: 1px solid black;
+                padding: 0.1em;
+                overflow:hidden;
+                display: inline-block;
+            }
+            #colour-grid .colour-cell {
+                float:left;width:20px;height:20px;
+                position: relative;
+            }
+            #planet-count {
+                text-align: left;
+                display: inline;
+            }
+        </style>
+    </head>
+    <body>
+
+    <div id="container">
+        <div id="universe">
+        </div>
+        <div id="hud">
+            <div id="colour-grid">
+                <div class="colour-cell" style="background-color:#ffffff" onclick="javascript:selected_mass=10000;"></div>
+                <div class="colour-cell" style="background-color:#3de62e" onclick="javascript:selected_mass=100000;"></div>
+                <div class="colour-cell" style="background-color:#d9e62e" onclick="javascript:selected_mass=1000000;"></div>
+                <div class="colour-cell" style="background-color:#e6a32e" onclick="javascript:selected_mass=10000000;"></div>
+                <div class="colour-cell" style="background-color:#e67c2e" onclick="javascript:selected_mass=100000000;"></div>
+                <div class="colour-cell" style="background-color:#e62e2e" onclick="javascript:selected_mass=1000000000;"></div>
+            </div>
+            <div id="planet-count" style="position:relative;left:0.1em"></div>
+        </div>
+    </div>
+    </body>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+      <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>
+      <script src="js/nugjs.js"></script>
+
+    <script type="text/javascript">
+
+    universe = new Universe("universe", "My little universe");
+    universe.init();
+
+    // Set mass scale
+    var selected_mass = 1000;
+
+    $( "#universe" ).mousedown(function(e) {
+        universe.mouse_down((e.pageX - this.offsetLeft) / this.clientWidth, (e.pageY - this.offsetTop) / this.clientHeight);
+    });
+
+    $( "#universe" ).mouseup(function(e) {
+        universe.mouse_up(selected_mass, (e.pageX - this.offsetLeft) / this.clientWidth, (e.pageY - this.offsetTop) / this.clientHeight);
+    });
+
+    $(document).keydown(function(e) {
+        var pace = 50;
+        if (event.keyCode == 37) {
+            universe.move_camera(-pace, 0);
+        } else if (event.keyCode == 38) {
+            universe.move_camera(0, pace);
+        } else if (event.keyCode == 39) {
+            universe.move_camera(pace, 0);
+        } else if (event.keyCode == 40) {
+            universe.move_camera(0, -pace);
+        }
+    });
+
+    $(window).bind('mousewheel DOMMouseScroll', function(event){
+        if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+            universe.mouse_wheel(1);
+        }
+        else {
+            universe.mouse_wheel(-1);
+        }
+    });
+
+    $("#universe").mousemove(function(e){
+        universe.mouse_move((e.pageX - this.offsetLeft) / this.clientWidth, (e.pageY - this.offsetTop) / this.clientHeight);
+    });
+
+    universe.registerHudInfo(function(p){
+        $("#planet-count").html("Planets: " + p);
+    });
+
+
+    </script>
+</html>
