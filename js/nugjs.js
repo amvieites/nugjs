@@ -10,29 +10,26 @@ window.requestAnimFrame = (function(){
           };
 })();
 
-function Universe(div, name) {
-    this.TIME_MULTIPLIER = 10000;
+function Universe(div, name, width, height) {
+    this.width = width;
+    this.height = height;
+    this.TIME_MULTIPLIER = 1;
     this.clock = new THREE.Clock();
-    this.G_FORCE = 6.674E-11;
+    this.G_FORCE = 1;//6.674E-11;
     this.draw_trajectories = false;
     this.container = div;
     this.name = name;
     this.planets = [];
     this.view = [];
     this.view.mouse = [];
-
 }
 
 Universe.prototype.init = function() {
-    // set the scene size
-    var WIDTH = 720,
-        HEIGHT = 405;
-
     // set some camera attributes
     var VIEW_ANGLE = 45,
-        ASPECT = WIDTH / HEIGHT,
+        ASPECT = this.width / this.height,
         NEAR = 0.1,
-        FAR = 10000;
+        FAR = 100000;
 
     // get the DOM element to attach to
     // - assume we've got jQuery to hand
@@ -46,10 +43,10 @@ Universe.prototype.init = function() {
 
     this.view.camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
     // the camera starts at 0,0,0 so pull it back
-    this.view.camera.position.z = 5000;
+    this.view.camera.position.z = 10000;
 
     // start the renderer
-    renderer.setSize(WIDTH, HEIGHT);
+    renderer.setSize(this.width, this.height);
 
     // attach the render-supplied DOM element
     $container.append(renderer.domElement);
@@ -66,26 +63,8 @@ Universe.prototype.init = function() {
     pointLight.position.z = 10000;
     this.view.scene.add(pointLight);
 
-    // Draw axis
-    //this.draw_axis();
-
     // draw!
     this.update();
-}
-
-Universe.prototype.draw_axis = function() {
-    var geometry = new THREE.Geometry();
-    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial(
-        { color: 0xffffff, opacity: 0.5}));
-    geometry.vertices.push(new THREE.Vector3(-400, 0, 0));
-    geometry.vertices.push(new THREE.Vector3(400, 0, 0));
-    this.view.scene.add(line);
-    geometry = new THREE.Geometry()
-    line = new THREE.Line(geometry, new THREE.LineBasicMaterial(
-        { color: 0xffffff, opacity: 0.5}));
-    geometry.vertices.push(new THREE.Vector3(0, 400, 0));
-    geometry.vertices.push(new THREE.Vector3(0, -400, 0));
-    this.view.scene.add(line);
 }
 
 /*
@@ -133,8 +112,8 @@ Universe.prototype.update = function() {
                     planets_to_remove.push(this.merge(this.planets[i], this.planets[j]));
                 }
             }
-            this.move(t, this.planets[i]);
         }
+        this.move(t, this.planets[i]);
     }
     for (var i = 0; i< planets_to_remove.length; i++) {
         this.del_planet(planets_to_remove[i]);
@@ -143,7 +122,7 @@ Universe.prototype.update = function() {
     // draw
     this.view.renderer.render(this.view.scene, this.view.camera);
 
-    // set up the next call (the bind method gets rid of the 'this' pointer missplacements)
+    // set up the next call (the bind method gets rid of all 'this' pointer missplacements)
     requestAnimationFrame(this.update.bind(this));
 }
 
@@ -154,37 +133,35 @@ Universe.prototype.check_user_interactions = function() {
 }
 
 /*
- * Moves the planet2 towards planet1.
+ * Moves the planet.
  */
-Universe.prototype.move = function(t, planet2) {
-    // Force applied on planet2 due to planet1
-
-    var last_acceleration = new THREE.Vector3(planet2.acceleration.x,
-                                              planet2.acceleration.y,
-                                              planet2.acceleration.z);
-    var pos = new THREE.Vector3(planet2.mesh.position.x,
-                                planet2.mesh.position.y,
-                                planet2.mesh.position.z);
-    pos.x += planet2.velocity.x * t + (0.5 * last_acceleration.x * Math.pow(t, 2));
-    pos.y += planet2.velocity.y * t + (0.5 * last_acceleration.y * Math.pow(t, 2));
-    pos.z += planet2.velocity.z * t + (0.5 * last_acceleration.z * Math.pow(t, 2));
-    var last_pos = new THREE.Vector3(planet2.getPos().x,
-                                        planet2.getPos().y,
-                                        planet2.getPos().z);
-    planet2.setPos(pos);
-    planet2.acceleration.x = planet2.force.x / planet2.mass;
-    planet2.acceleration.y = planet2.force.y / planet2.mass;
-    planet2.acceleration.z = planet2.force.z / planet2.mass;
-    var avg_acceleration = new THREE.Vector3((last_acceleration.x + planet2.acceleration.x) / 2,
-                                             (last_acceleration.y + planet2.acceleration.y) / 2,
-                                             (last_acceleration.z + planet2.acceleration.z) / 2);
-    planet2.velocity.x += avg_acceleration.x * t;
-    planet2.velocity.y += avg_acceleration.y * t;
-    planet2.velocity.z += avg_acceleration.z * t;
+Universe.prototype.move = function(t, planet) {
+    var last_acceleration = new THREE.Vector3(planet.acceleration.x,
+                                              planet.acceleration.y,
+                                              planet.acceleration.z);
+    var pos = new THREE.Vector3(planet.mesh.position.x,
+                                planet.mesh.position.y,
+                                planet.mesh.position.z);
+    pos.x += planet.velocity.x * t + (0.5 * last_acceleration.x * Math.pow(t, 2));
+    pos.y += planet.velocity.y * t + (0.5 * last_acceleration.y * Math.pow(t, 2));
+    pos.z += planet.velocity.z * t + (0.5 * last_acceleration.z * Math.pow(t, 2));
+    var last_pos = new THREE.Vector3(planet.getPos().x,
+                                        planet.getPos().y,
+                                        planet.getPos().z);
+    planet.setPos(pos);
+    planet.acceleration.x = planet.force.x / planet.mass;
+    planet.acceleration.y = planet.force.y / planet.mass;
+    planet.acceleration.z = planet.force.z / planet.mass;
+    var avg_acceleration = new THREE.Vector3((last_acceleration.x + planet.acceleration.x) / 2,
+                                             (last_acceleration.y + planet.acceleration.y) / 2,
+                                             (last_acceleration.z + planet.acceleration.z) / 2);
+    planet.velocity.x += avg_acceleration.x * t;
+    planet.velocity.y += avg_acceleration.y * t;
+    planet.velocity.z += avg_acceleration.z * t;
 
     // draw trajectory
     if (this.draw_trajectories) {
-        planet2.addTrajectoryPoint(planet2.getPos());
+        planet.addTrajectoryPoint(planet.getPos());
     }
 }
 
@@ -276,6 +253,9 @@ Planet.prototype.calculate_colour = function(mass) {
     }
 }
 
+/*
+ * Someday...
+ */
 Planet.prototype.addTrajectoryPoint = function(point) {
     if (typeof this.trajectory == 'undefined') {
         var geometry = new THREE.Geometry();
@@ -303,17 +283,15 @@ Planet.prototype.setPos = function(pos) {
   * Get radius from sphere volume assuming the density of Iron.
   */
 Planet.prototype.calculate_radius = function(mass) {
-    var DENSITY = 7874;
+    //var DENSITY = 7874;
     //return Math.pow((3 * mass) / (4 * Math.PI * DENSITY), 1/3);
-    return 2*Math.log(mass);
+    return Math.log(Math.pow(mass, 3));
 }
 
 function getXY(camera, cX, cY) {
     var projector = new THREE.Projector();
     var planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    var mv = new THREE.Vector3(cX * 2 - 1,
-        -cY * 2 + 1,
-        0.5 );
+    var mv = new THREE.Vector3(cX * 2 - 1, -cY * 2 + 1, 0.5 );
     var raycaster = projector.pickingRay(mv, camera);
     var pos = raycaster.ray.intersectPlane(planeZ);
 
@@ -357,8 +335,8 @@ Universe.prototype.mouse_move = function(x, y) {
 Universe.prototype.mouse_up = function(mass, x, y) {
     if (this.view.mouse.down_position !== undefined) {
         var new_pos = getXY(this.view.camera, x, y);
-        var v = new THREE.Vector3((new_pos.x - this.view.mouse.down_position.x) * 0.00001,
-                                  (new_pos.y - this.view.mouse.down_position.y) * 0.00001, 0);
+        var v = new THREE.Vector3((new_pos.x - this.view.mouse.down_position.x) * 0.1,
+                                  (new_pos.y - this.view.mouse.down_position.y) * 0.1, 0);
         this.add_planet(mass, undefined, this.view.mouse.down_position.x, this.view.mouse.down_position.y, v.x, v.y);
         // Release
         this.view.mouse.down_position = undefined;
@@ -369,7 +347,7 @@ Universe.prototype.mouse_up = function(mass, x, y) {
 }
 
 Universe.prototype.mouse_wheel = function(updown) {
-    this.view.camera.position.z += updown * 10;
+    this.view.camera.position.z += updown * this.view.camera.position.z/5;
 }
 
 Universe.prototype.registerHudInfo = function(f) {

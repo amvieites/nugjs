@@ -4,40 +4,6 @@
     <head>
         <meta charset="utf-8" />
         <title>Universe</title>
-        <style>
-            body {
-                text-align: center;
-                font-family: "Verdana";
-                font-size: 0.6em;
-                padding: 0;
-                margin: 0;
-            }
-            #universe {
-                background: #fff;
-            }
-            #container {
-                text-align: left;
-                display: inline-block;
-            }
-            #hud {
-                width: 100%;
-                display: inline-block;
-            }
-            #colour-grid {
-                border: 1px solid black;
-                padding: 0.1em;
-                overflow:hidden;
-                display: inline-block;
-            }
-            #colour-grid .colour-cell {
-                float:left;width:20px;height:20px;
-                position: relative;
-            }
-            #planet-count {
-                text-align: left;
-                display: inline;
-            }
-        </style>
     </head>
     <body>
 
@@ -55,15 +21,25 @@
             </div>
             <div id="planet-count" style="position:relative;left:0.1em"></div>
         </div>
+        <ul>
+            <li>Zoom in: scroll down</li>
+            <li>Zoom out: scroll up</li>
+            <li>Add planet: select color and hold mouse for initial velocity</li>
+            <li>Move camera: &larr;&uarr;&darr;&rarr;</li>
+        </ul>
     </div>
+    <footer style="position:relative;top:100px">
+        Original idea: <a href="http://en.wikipedia.org/wiki/Isaac_Newton">Sir Isaac Newton</a><br/>
+        Inspiration: <a href="http://www.nowykurier.com/toys/gravity/gravity.html">here</a>
+    </footer>
     </body>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-      <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>
-      <script src="js/nugjs.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>
+    <script src="js/nugjs.js"></script>
 
     <script type="text/javascript">
 
-    universe = new Universe("universe", "My little universe");
+    universe = new Universe("universe", "My little universe", 720, 405);
     universe.init();
 
     // Set mass scale
@@ -109,4 +85,38 @@
 
 
     </script>
+        <style>
+            body {
+                text-align: center;
+                font-family: "Verdana";
+                font-size: 0.6em;
+                padding: 0;
+                margin: 0;
+            }
+            #universe {
+                background: #fff;
+            }
+            #container {
+                text-align: left;
+                display: inline-block;
+            }
+            #hud {
+                width: 100%;
+                display: inline-block;
+            }
+            #colour-grid {
+                border: 1px solid black;
+                padding: 0.1em;
+                overflow:hidden;
+                display: inline-block;
+            }
+            #colour-grid .colour-cell {
+                float:left;width:20px;height:20px;
+                position: relative;
+            }
+            #planet-count {
+                text-align: left;
+                display: inline;
+            }
+        </style>
 </html>
